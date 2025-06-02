@@ -1,9 +1,9 @@
-import { ethers } from "hardhat";
+const { ethers } = require("hardhat");
 
 async function main() {
-  const DAO = await ethers.getContractFactory("PrivacyVotingDAO");
-  const dao = await DAO.deploy();
-  await dao.deployed();
+  const DAOFactory = await ethers.getContractFactory("PrivacyVotingDAO");
+  const dao = await DAOFactory.deploy(); // deploy() mengirimkan transaksi
+  await dao.deployed(); // tunggu hingga transaksi mining selesai
   console.log("DAO deployed to:", dao.address);
 }
 
