@@ -17,12 +17,22 @@ async function createProposal() {
   const wallet = new ethers.Wallet(PRIVATE_KEY, provider);
   const contract = new ethers.Contract(CONTRACT_ADDRESS, abi, wallet);
 
-  const title = "Uji voting baru";
-  const description = "Proposal untuk pengujian sistem voting backend";
-  const proposalType = 0; // 0 = Yes/No
-  const options = ["Yes", "No"];
+  // Randomly pick a proposal type
+  const isBinary = Math.random() < 0.5; // 50% chance
+  const proposalType = isBinary ? 0 : 1; // 0 = Binary, 1 = Multiple
+  const title = isBinary
+    ? "Proposal Voting Yes/No"
+    : "Proposal Voting Multiple Choice";
+  const description = isBinary
+    ? "Pilih Ya atau Tidak"
+    : "Pilih salah satu dari beberapa opsi";
+
+  const options = isBinary
+    ? ["Yes", "No"]
+    : ["Opsi A", "Opsi B", "Opsi C", "Opsi D"]; // bisa disesuaikan
 
   console.log("📝 Membuat proposal...");
+  console.log({ title, proposalType, options });
 
   const tx = await contract.createProposal(
     title,
@@ -36,15 +46,7 @@ async function createProposal() {
   const proposalId = event.args.id.toString();
 
   console.log(`✅ Proposal berhasil dibuat. ID: ${proposalId}`);
-
-  // Buka voting setelah proposal dibuat (pastikan fungsi ini ada di smart contract)
-  try {
-    const openTx = await contract.openVoting(proposalId);
-    await openTx.wait();
-    console.log(`🚀 Voting untuk proposal #${proposalId} telah dibuka.`);
-  } catch (err) {
-    console.error("⚠️ Gagal membuka voting:", err.reason || err.message);
-  }
+  console.log(`🔓 Voting langsung terbuka untuk proposal ini.`);
 }
 
 createProposal().catch((err) => {
